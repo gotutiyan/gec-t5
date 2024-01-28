@@ -180,8 +180,8 @@ python generate.py \
 
 ### Insights
 - In CoNLL-2014, `retokenize.py` improves F0.5 more than 2 points.
-- For `google/t5-small`, at least 10 epochs could not reproduce the competetive results of the paper. The above results are checkpoints at 90 epochs. This means that even after 90 epochs of training, the minimum loss is still achieved with BEA19-dev. (Probably, increasing the learning rate is better)
-    - 10 epochs seems enough for `google/t5-base` and `google/t5-large`.
+- For `google/t5-v1_1-small`, at least 10 epochs could not reproduce the competetive results of the paper. The above results are checkpoints at 90 epochs. This means that even after 90 epochs of training, the minimum loss is still achieved with BEA19-dev. (Probably, increasing the learning rate is better)
+    - 10 epochs seems enough for `google/t5-v1_1-base` and `google/t5-v1_1-large`.
 
 # License
 
