@@ -173,8 +173,8 @@ python generate.py \
 |paper (t5-xl)|-/-/67.65|-|-/-/73.92|
 |paper (t5-xxl)|-/-/68.75|-|-/-/75.88|
 |[gotutiyan/gec-t5-small-clang8](https://huggingface.co/gotutiyan/gec-t5-small-clang8)|68.96 / 41.17 / 60.76|60.34 / 34.00 / 52.24|71.47 / 54.14 / 67.17|
-|[gotutiyan/gec-t5-base-clang8](https://huggingface.co/gotutiyan/gec-t5-small-clang8)|72.98 / 45.24 / 65.01|63.65 / 37.01 / 55.64|74.15 / 58.28 / 70.32|
-|[gotutiyan/gec-t5-large-clang8](https://huggingface.co/gotutiyan/gec-t5-small-clang8)|74.48 / 48.63 / 67.32|65.94 / 40.64 / 58.64|76.88 / 62.27 / 73.44|
+|[gotutiyan/gec-t5-base-clang8](https://huggingface.co/gotutiyan/gec-t5-base-clang8)|72.98 / 45.24 / 65.01|63.65 / 37.01 / 55.64|74.15 / 58.28 / 70.32|
+|[gotutiyan/gec-t5-large-clang8](https://huggingface.co/gotutiyan/gec-t5-large-clang8)|74.48 / 48.63 / 67.32|65.94 / 40.64 / 58.64|76.88 / 62.27 / 73.44|
 |gotutiyan/gec-t5-xl-clang8|TBA?|||
 |gotutiyan/gec-t5-xxl-clang8|TBA?|||
 
