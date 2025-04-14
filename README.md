@@ -29,13 +29,36 @@ Confirmed that it works on python 3.11.0.
 # Installation
 
 ```sh
-# python -m venv env
-# source env/bin/activate
-pip install -r requirements.txt
-wget https://github.com/google-research-datasets/clang8/raw/main/retokenize.py
+pip install git+https://github.com/gotutiyan/gec-t5
 ```
 
-# Procedure
+# Usage
+
+For CLI, it provides `gec-t5-generate`.
+```sh
+gec-t5-generate \
+    --input path/to/conll14.src \
+    --restore gotutiyan/gec-t5-base-clang8 \
+    --batch_size 32 > temp.out
+```
+
+For API,
+```python
+from gec_t5 import generate
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+model = AutoModelForSeq2SeqLM.from_pretrained(args.restore_dir).cuda()
+tokenizer = AutoTokenizer.from_pretrained(args.restore_dir)
+predictions: list[str] = generate(
+    model=model,
+    tokenizer=tokenizer,
+    sources=open('path/to/input.txt').read().rstrip().split('\n'),
+    batch_size=32,
+    retok=False  # True is recommended for CoNLL-2014 inference.
+)
+print('\n'.join(predictions))
+```
+
+# How to train
 
 ### 1. Train a model
 The follwing example trains a model on four GPUs.  
@@ -81,11 +104,11 @@ outputs/sample/
 
 ### 2. Inference
 
-`generate.py` can be used for inference.  
+It provides CLI `gec-t5-generate` for inference.  
 This script processes the input sentences in the sorted order by length, for faster inference.  
 The output is be shown in your terminal, so use redirection to save it to a file.
 ```
-python generate.py \
+gec-t5-generate \
     --input <a raw text file> \
     --restore_dir <path to the directory, like outputs/sample/best in the above example> \
     --batch_size 128 \
@@ -146,7 +169,9 @@ epochs: 10
 The checkpoint that achieves minimum loss on BEA19-dev was used for the evaluation.
 - For CoNLL-2014, I re-tokenized the output sentences by the following. Then M2scorer was used to evaluate.
     ```sh
-    python retokenize.py < conll14.out > conll14_retok.out
+    gec-t5-retokenize --input conll14.out --ouptut conll14_retok.out
+    # Or you can use --retok option for gec-t5-generate
+    # gec-t5-generate --input path/conll14.src --restore gotutiyan/gec-t5-base-clang8 --retok > conll14_retok.out
     ```
 - For BEA19-dev, I re-extract correction spans of the official reference by the following (see Sec4.1 in [Bryant+ 17](https://aclanthology.org/P17-1074/)). Then ERRANT was used to evaluate.
     ```sh
@@ -158,7 +183,7 @@ The checkpoint that achieves minimum loss on BEA19-dev was used for the evaluati
 The pre-trained models are available from Hugging Face Hub. You can use these models by specifying `--restore_dir` of `generate.py`.
 
 ```
-python generate.py \
+gec-t5-generate \
     --input <a raw text file> \
     --restore_dir gotutiyan/gec-t5-base-clang8 \
     --batch_size 64 \

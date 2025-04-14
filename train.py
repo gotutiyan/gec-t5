@@ -7,7 +7,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import os
-from dataset import generate_dataset
+from gec_t5.dataset import generate_dataset
 from tqdm import tqdm
 from collections import OrderedDict
 import json

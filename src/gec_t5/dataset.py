@@ -1,9 +1,5 @@
-import random
-import math
-import torch
 from typing import List, Tuple
 from transformers import PreTrainedTokenizer
-from transformers.models.bart.modeling_bart import shift_tokens_right
 
 class Dataset():
     def __init__(
@@ -65,26 +61,3 @@ class Dataset():
         self.srcs = [x[0] for x in data]
         self.trgs = [x[1] for x in data]
         self.orig_index = [x[2] for x in data]
-        
-
-def generate_dataset(
-    src_file: str,
-    trg_file: str,
-    tokenizer: PreTrainedTokenizer,
-    max_len: int,
-    is_inference=False
-) -> Dataset:
-    '''
-    This function recieves input file path(s) and returns Dataset instance.
-    '''
-    srcs = open(src_file).read().rstrip().split('\n')
-    trgs = open(trg_file).read().rstrip().split('\n')
-    return Dataset(
-        srcs=srcs,
-        trgs=trgs,
-        tokenizer=tokenizer,
-        max_len=max_len,
-        is_inference=is_inference
-    )
-
-    
