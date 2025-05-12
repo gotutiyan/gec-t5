@@ -72,7 +72,6 @@ def valid(model,
 def readlines(path):
     lines = open(path).readlines()
     lines = [l.rstrip() for l in lines]
-    print(lines[:5])
     return lines
 
 def main(args):
