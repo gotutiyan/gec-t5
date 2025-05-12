@@ -7,7 +7,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import os
-from gec_t5.dataset import generate_dataset
+from gec_t5.dataset import Dataset
 from tqdm import tqdm
 from collections import OrderedDict
 import json
@@ -69,6 +69,11 @@ def valid(model,
                         ))
     return {k: v/len(loader) for k, v in log.items()}
 
+def readlines(path):
+    lines = open(path).readlines()
+    lines = [l.rstrip() for l in lines]
+    return lines
+
 def main(args):
     config = json.load(open(os.path.join(args.restore_dir, 'my_config.json'))) if args.restore_dir else dict()
     model_id = config.get('model_id', args.model_id)
@@ -83,18 +88,18 @@ def main(args):
     torch.backends.cudnn.deterministic = True
     print('Loading model...')
     model = AutoModelForSeq2SeqLM.from_pretrained(args.restore_dir) if args.restore_dir else AutoModelForSeq2SeqLM.from_pretrained(model_id)
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tokenizer = AutoTokenizer.from_pretrained(args.restore_dir) if args.restore_dir else AutoTokenizer.from_pretrained(model_id)
     optimizer = optim.AdamW(model.parameters(), lr=args.lr)
     print('Loading datasets...')
-    train_dataset = generate_dataset(
-        src_file=args.trainpref+'.'+args.source,
-        trg_file=args.trainpref+'.'+args.target,
+    train_dataset = Dataset(
+        srcs=readlines(args.trainpref+'.'+args.source),
+        trgs=readlines(args.trainpref+'.'+args.target),
         tokenizer=tokenizer,
         max_len=args.max_len
     )
-    valid_dataset = generate_dataset(
-        src_file=args.validpref+'.'+args.source,
-        trg_file=args.validpref+'.'+args.target,
+    valid_dataset = Dataset(
+        srcs=readlines(args.validpref+'.'+args.source),
+        trgs=readlines(args.validpref+'.'+args.target),
         tokenizer=tokenizer,
         max_len=args.max_len
     )
@@ -104,7 +109,6 @@ def main(args):
     os.makedirs(os.path.join(args.outdir, 'last'), exist_ok=True)
     tokenizer.save_pretrained(os.path.join(args.outdir, 'best'))
     tokenizer.save_pretrained(os.path.join(args.outdir, 'last'))
-    print('Riding on accelerate ...')
     accelerator = Accelerator(gradient_accumulation_steps=args.accumulation)
     lr_scheduler = get_scheduler(
         name=args.lr_scheduler_type,
@@ -117,6 +121,7 @@ def main(args):
     model, optimizer, train_loader, valid_loader, lr_scheduler = accelerator.prepare(
         model, optimizer, train_loader, valid_loader, lr_scheduler
     )
+    print('Start training ...')
     for epoch in range(current_epoch, args.epochs):
         train_log = train(model, train_loader, optimizer, epoch, accelerator, lr_scheduler)
         valid_log = valid(model, valid_loader, epoch, accelerator)
@@ -163,10 +168,10 @@ def get_parser():
     parser.add_argument('--validpref', required=True)
     parser.add_argument('--source', required=True)
     parser.add_argument('--target', required=True)
-    parser.add_argument('--model_id', default='t5-base')
+    parser.add_argument('--model_id', default='google/t5-v1_1-base')
     parser.add_argument('--outdir', default='models/sample/')
     parser.add_argument('--lr', type=float, default=1e-5)
-    parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--epochs', type=int, default=5)
     parser.add_argument('--accumulation', type=int, default=4)
     parser.add_argument('--seed', type=int, default=5)

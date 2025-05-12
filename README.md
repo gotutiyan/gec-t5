@@ -32,6 +32,13 @@ Confirmed that it works on python 3.11.0.
 pip install git+https://github.com/gotutiyan/gec-t5
 ```
 
+Or,
+```sh
+git clone https://github.com/gotutiyan/gec-t5.git
+cd gec-t5
+pip install -e ./
+```
+
 # Usage
 
 For CLI, it provides `gec-t5-generate`.
